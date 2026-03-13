@@ -18,10 +18,13 @@ const API_OPTIONS ={
 
 const App = () => {
     const [searchTerm,setSearchTerm] = useState('');
-    const [errorMessage,setErrorMessage]=useState('');
+    const [debouncedSearchTerm ,setDebouncedSearchTerm]=useState('');
+
     const [movieList, setMovieList]=useState([]);
+    const [errorMessage,setErrorMessage]=useState('');
     const [isLoading ,setisLoading]=useState(false);
-    const [debouncedSearchTerm ,setDebouncedSearchTerm]=useState('')
+
+    const [trendingMovies,setTrendingMovies]=useState([]);
 
 
     //prevent API server from overloading,Since traditionally every time we type a letter in search bar it sends the fetch request.
@@ -35,7 +38,7 @@ const App = () => {
         try{
             const endpoint =
                 query ?
-                `${API_BASE_URL}/search/movie?query=${encodeURIComponent(query)})` :
+                `${API_BASE_URL}/search/movie?query=${encodeURIComponent(query)}` :
                 `${API_BASE_URL}/discover/movie?sort_by=popularity.desc`;
             const response = await fetch(endpoint,API_OPTIONS);
 
@@ -54,6 +57,10 @@ const App = () => {
             }
 
             setMovieList(data.results || []);
+
+            if(debouncedSearchTerm && data.results.length > 0){
+                updateSearchCount(debouncedSearchTerm,data.results[0]);
+            }
         }
         catch (error) {
             console.error(`Error fetching movie ${error}`);
@@ -64,9 +71,50 @@ const App = () => {
         }
     }
 
+    const updateSearchCount = async (searchTerm,movie) => {
+        try{
+            await fetch("http://localhost:5000/api/metrics",{
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    searchTerm : searchTerm,
+                    movie_id:movie.id,
+                    poster_path: movie.poster_path,
+                }),
+            });
+        }
+        catch(error){
+            console.log("Error updating search count",error);
+        }
+    };
+
+    const fetchTrendingMovies = async() => {
+        try{
+            const response = await fetch("http://localhost:5000/api/trending");
+            if (!response.ok) {
+                throw new Error("Failed to fetch trending movies");
+            }
+            const data = await response.json();
+            setTrendingMovies(data);
+            console.log(data);
+        }catch (error) {
+            console.log("Error fetching trending movies",error);
+        }
+    }
+
     useEffect(()=>{
         fetchMovie(debouncedSearchTerm);
-    },[debouncedSearchTerm])
+    },[debouncedSearchTerm]);
+
+    useEffect(()=>{
+        fetchTrendingMovies();
+    },[]);
+
+
+
+
     return (
         <main>
             <div className="pattern">
@@ -77,6 +125,21 @@ const App = () => {
                     <h1>find <span className="text-gradient">Movies</span> you'll Enjoy Without the Hassle</h1>
                     <Search searchTerm={searchTerm} setSearchTerm={setSearchTerm}></Search>
                 </header>
+
+                {trendingMovies.length > 0 && (
+                    <section className="trending">
+                        <h2>Trending Movies</h2>
+                        <ul>
+                            {trendingMovies.map((movie,index) => (
+                                <li key={index}>
+                                    <p>{index + 1}</p>
+                                    <img src={`https://image.tmdb.org/t/p/w500/${movie.poster_url}`} alt={movie.searchTerm}/>
+                                </li>
+                                ))}
+                        </ul>
+
+                    </section>
+                )}
 
                 <section >
                     <h2>All Movies</h2>
