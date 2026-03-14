@@ -2,12 +2,19 @@ import express from 'express';
 import cors from 'cors';
 import pg from 'pg';
 
+// const db = new pg.Client({
+//     user : "postgres",
+//     host : "localhost",
+//     database : "Movie-app",
+//     password : "omik",
+//     port : 5432,
+// });
+
 const db = new pg.Client({
-    user : "postgres",
-    host : "localhost",
-    database : "Movie-app",
-    password : "omik",
-    port : 5432,
+    connectionString: process.env.DATABASE_URL,
+    ssl: {
+        rejectUnauthorized: false,
+    },
 });
 
 await db.connect();
