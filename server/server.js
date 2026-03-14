@@ -10,14 +10,20 @@ import pg from 'pg';
 //     port : 5432,
 // });
 
+
 const db = new pg.Client({
     connectionString: process.env.DATABASE_URL,
     ssl: {
-        rejectUnauthorized: false,
-    },
+        rejectUnauthorized: false
+    }
 });
 
-await db.connect();
+try {
+    await db.connect();
+    console.log("Database connected");
+} catch (err) {
+    console.error("Database connection failed:", err);
+}
 
 const app = express();
 
@@ -74,6 +80,12 @@ app.get("/api/trending",async (req, res) => {
 })
 
 
-app.listen(5000,()=>{
-    console.log("Server running on port 5000...");
+// app.listen(5000,()=>{
+//     console.log("Server running on port 5000...");
+// });
+
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
 });
