@@ -10,21 +10,6 @@ import pg from 'pg';
 //     port : 5432,
 // });
 
-
-const db = new pg.Client({
-    connectionString: process.env.DATABASE_URL,
-    ssl: {
-        rejectUnauthorized: false
-    }
-});
-
-try {
-    await db.connect();
-    console.log("Database connected");
-} catch (err) {
-    console.error("Database connection failed:", err);
-}
-
 const app = express();
 
 app.use(cors());
@@ -89,3 +74,21 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, "0.0.0.0", () => {
     console.log(`Server running on port ${PORT}`);
 });
+
+const db = new pg.Client({
+    connectionString: process.env.DATABASE_URL,
+    ssl: {
+        rejectUnauthorized: false,
+    },
+});
+
+async function connectDB() {
+    try {
+        await db.connect();
+        console.log("Database connected");
+    } catch (err) {
+        console.error("Database connection failed:", err);
+    }
+}
+
+connectDB();
