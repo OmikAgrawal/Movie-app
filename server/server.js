@@ -2,14 +2,6 @@ import express from 'express';
 import cors from 'cors';
 import pg from 'pg';
 
-// const db = new pg.Client({
-//     user : "postgres",
-//     host : "localhost",
-//     database : "Movie-app",
-//     password : "omik",
-//     port : 5432,
-// });
-
 const app = express();
 
 app.use(cors());
@@ -65,16 +57,6 @@ app.get("/api/trending",async (req, res) => {
 })
 
 
-// app.listen(5000,()=>{
-//     console.log("Server running on port 5000...");
-// });
-
-const PORT = process.env.PORT || 5000;
-
-app.listen(PORT, "0.0.0.0", () => {
-    console.log(`Server running on port ${PORT}`);
-});
-
 const db = new pg.Client({
     connectionString: process.env.DATABASE_URL,
     ssl: {
@@ -82,13 +64,22 @@ const db = new pg.Client({
     },
 });
 
-async function connectDB() {
+async function startServer() {
     try {
         await db.connect();
         console.log("Database connected");
+
+        const PORT = process.env.PORT || 5000;
+
+        app.listen(PORT, "0.0.0.0", () => {
+            console.log(`Server running on port ${PORT}`);
+        });
+
     } catch (err) {
         console.error("Database connection failed:", err);
+        process.exit(1); // 💥 VERY IMPORTANT for Railway
     }
 }
 
-connectDB();
+startServer();
+
