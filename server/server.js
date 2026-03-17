@@ -11,6 +11,10 @@ app.get('/', (req, res) => {
     res.json({message : 'Backend working'});
 })
 
+app.get("/ping", (req, res) => {
+    res.send("pong");
+});
+
 app.post("/api/metrics", async (req, res) => {
     try {
         const { searchTerm, movie_id, poster_path } = req.body;
@@ -71,7 +75,7 @@ async function startServer() {
 
         const PORT = process.env.PORT || 5000;
 
-        app.listen(PORT, "0.0.0.0", () => {
+        app.listen(PORT,() => {
             console.log(`Server running on port ${PORT}`);
         });
 
