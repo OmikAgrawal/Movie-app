@@ -73,7 +73,7 @@ const App = () => {
 
     const updateSearchCount = async (searchTerm,movie) => {
         try{
-            await fetch("http://localhost:5000/api/metrics",{
+            await fetch("https://movie-app-production-bb82.up.railway.app/api/metrics",{
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -92,7 +92,7 @@ const App = () => {
 
     const fetchTrendingMovies = async() => {
         try{
-            const response = await fetch("http://localhost:5000/api/trending");
+            const response = await fetch("https://movie-app-production-bb82.up.railway.app/api/trending");
             if (!response.ok) {
                 throw new Error("Failed to fetch trending movies");
             }
