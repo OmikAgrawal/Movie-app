@@ -88,7 +88,7 @@ This returns the **top 5 most searched movies**.
 ### 1️⃣ Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/movie-app.git
+git clone https://github.com/OmikAgrawal/Movie-app
 cd movie-app
 ```
 
